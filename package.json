@@ -1,6 +1,6 @@
 {
   "name": "@emmetio/stream-reader",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Reads text as stream",
   "main": "dist/stream-reader.cjs.js",
   "jsnext:main": "dist/stream-reader.es.js",
@@ -15,7 +15,11 @@
     "type": "git",
     "url": "git+https://github.com/emmetio/stream-reader.git"
   },
-  "keywords": ["emmet", "stream", "reader"],
+  "keywords": [
+    "emmet",
+    "stream",
+    "reader"
+  ],
   "author": "Sergey Chikuyonok <serge.che@gmail.com>",
   "license": "MIT",
   "bugs": {
