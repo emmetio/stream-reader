@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "Reads text as stream",
   "main": "dist/stream-reader.cjs.js",
-  "jsnext:main": "dist/stream-reader.es.js",
+  "module": "dist/stream-reader.es.js",
   "scripts": {
     "test": "mocha",
-    "build": "npm run build:cjs && npm run build:es",
-    "build:cjs": "rollup -o dist/stream-reader.cjs.js -f cjs ./index.js",
-    "build:es": "rollup -o dist/stream-reader.es.js -f es ./index.js",
+    "build": "rollup -c",
     "prepublish": "npm run test && npm run build"
   },
   "repository": {
