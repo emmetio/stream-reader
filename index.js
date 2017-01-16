@@ -3,7 +3,7 @@
 const escapeCode = 92; // \ char
 
 /**
- * A sreaming string reader
+ * A streaming string reader
  * NB Use `.*Code()` and `.charCodeAt()` methods as much as possible to reduce
  * string allocations and save some CPU and memory
  */
