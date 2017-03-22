@@ -1,92 +1,59 @@
 'use strict';
 
-const escapeCode = 92; // \ char
-
 /**
- * A streaming string reader
- * NB Use `.*Code()` and `.charCodeAt()` methods as much as possible to reduce
- * string allocations and save some CPU and memory
+ * A streaming, character code-based string reader
  */
 export default class StreamReader {
-	constructor(string) {
-		this.pos = this.start = 0;
+	constructor(string, pos) {
+		this.pos = this.start = pos || 0;
 		this.string = string;
-		this._length = string.length;
 	}
 
 	/**
-	 * Returns true only if the stream is at the end of the line.
+	 * Returns true only if the stream is at the end of the file.
 	 * @returns {Boolean}
 	 */
-	eol() {
-		return this.pos >= this._length;
+	eof() {
+		return this.pos >= this.string.length;
 	}
 
 	/**
-	 * Returns the next character in the stream without advancing it.
-	 * Will return <code>undefined</code> at the end of the line.
-	 * @returns {String}
+	 * Returns the next character code in the stream without advancing it.
+	 * Will return NaN at the end of the file.
+	 * @returns {Number}
 	 */
 	peek() {
-		return this.string.charAt(this.pos);
-	}
-
-    /**
-	 * Returns the next character code in the stream without advancing it.
-	 * Will return <code>undefined</code> at the end of the line.
-	 * @returns {String}
-	 */
-	peekCode() {
 		return this.string.charCodeAt(this.pos);
 	}
 
 	/**
 	 * Returns the next character in the stream and advances it.
 	 * Also returns <code>undefined</code> when no more characters are available.
-	 * @returns {String}
+	 * @returns {Number}
 	 */
 	next() {
-		if (this.pos < this._length) {
-			return this.string.charAt(this.pos++);
-		}
-	}
-
-    /**
-	 * Returns the next character in the stream and advances it.
-	 * Also returns <code>undefined</code> when no more characters are available.
-	 * @returns {String}
-	 */
-	nextCode() {
-		if (this.pos < this._length) {
+		if (this.pos < this.string.length) {
 			return this.string.charCodeAt(this.pos++);
 		}
 	}
 
 	/**
-	 * `match` can be a character, a regular expression, or a function that
-	 * takes a character and returns a boolean. If the next character in the
-	 * stream 'matches' the given argument, it is consumed and returned.
-	 * Otherwise, undefined is returned.
-	 * @param {String|Number|Function|Regexp} match
+	 * `match` can be a character code or a function that takes a character code
+	 * and returns a boolean. If the next character in the stream 'matches'
+	 * the given argument, it is consumed and returned.
+	 * Otherwise, `false` is returned.
+	 * @param {Number|Function} match
 	 * @returns {Boolean}
 	 */
 	eat(match) {
-		let ok;
-
-        if (typeof match === 'number') {
-			ok = this.peekCode() === match;
-		} else if (typeof match === 'string') {
-			ok = this.peekCode() === match.charCodeAt(0);
-		} else {
-            const ch = this.peek();
-			ok = ch && (match.test ? match.test(ch) : match(ch));
-		}
+		const ch = this.peek();
+		const ok = typeof match === 'function' ? match(ch) : ch === match;
 
 		if (ok) {
-			++this.pos;
+			this.next();
 		}
 
-        return ok;
+		return ok;
 	}
 
 	/**
@@ -97,23 +64,8 @@ export default class StreamReader {
 	 */
 	eatWhile(match) {
 		const start = this.pos;
-		while (this.eat(match)) {}
-		return this.pos > start;
-	}
-
-	/**
-	 * Skips to the next occurrence of the given character, if found on the
-	 * current line (doesn't advance the stream if the character does not
-	 * occur on the line). Returns true if the character was found.
-	 * @param {String} ch
-	 * @returns {Boolean}
-	 */
-	skipTo(ch) {
-		const found = this.string.indexOf(ch, this.pos);
-		if (found > -1) {
-			this.pos = found;
-			return true;
-		}
+		while (!this.eof() && this.eat(match)) {}
+		return this.pos !== start;
 	}
 
 	/**
@@ -133,46 +85,6 @@ export default class StreamReader {
 	current() {
 		return this.string.slice(this.start, this.pos);
 	}
-
-	/**
-	 * Consumes word from current stream that matches given `match` argument
-	 * and returns it
-	 */
-	consume(match) {
-		this.start = this.pos;
-		this.eatWhile(match);
-		return this.current();
-	}
-
-	/**
-	 * A helper function to eat string literal, e.g. a "double-quoted"
-	 * or 'single-quoted' value
-	 * @param  {Number|String} quote An opening quote
-	 * @return {Boolean}
-	 */
-	eatQuoted(quote) {
-		const pos = this.pos;
-        const quoteCode = typeof quote === 'number' ? quote : quote.charCodeAt(0);
-
-		while (!this.eol()) {
-            switch (this.nextCode()) {
-                case quoteCode:  return true;
-                case escapeCode: this.pos++;
-            }
-		}
-
-        this.pos = pos; // revert pos
-		return false;
-	}
-
-    /**
-     * Saves start position at current stream offset
-     * @param {Number} [pos] Start position. If not given, `.pos` is used
-     * @return {Number} New start position
-     */
-    save(pos) {
-        return this.start = pos == null ? this.pos : pos;
-    }
 
 	/**
 	 * Creates error object with current stream state
