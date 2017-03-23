@@ -92,7 +92,7 @@ export default class StreamReader {
 	 * @return {Error}
 	 */
 	error(message) {
-		const err = new Error(`${message} at char ${this.pos + 1} of "${this.string}" string`);
+		const err = new Error(`${message} at char ${this.pos + 1}`);
 		err.originalMessage = message;
 		err.pos = this.pos;
 		err.string = this.string;
