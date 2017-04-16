@@ -4,9 +4,10 @@
  * A streaming, character code-based string reader
  */
 export default class StreamReader {
-	constructor(string, pos) {
-		this.pos = this.start = pos || 0;
+	constructor(string, start, end) {
 		this.string = string;
+		this.pos = this.start = start || 0;
+		this.end = end != null ? end : this.string.length;
 	}
 
 	/**
@@ -14,7 +15,19 @@ export default class StreamReader {
 	 * @returns {Boolean}
 	 */
 	eof() {
-		return this.pos >= this.string.length;
+		return this.pos >= this.end;
+	}
+
+	/**
+	 * Creates a new stream instance which is limited to given `start` and `end`
+	 * range. E.g. its `eof()` method will look at `end` property, not actual
+	 * stream end
+	 * @param  {Point} start
+	 * @param  {Point} end
+	 * @return {StreamReader}
+	 */
+	limit(start, end) {
+		return new this.constructor(this.string, start, end);
 	}
 
 	/**
@@ -74,7 +87,7 @@ export default class StreamReader {
 	 * @param {Number} n
 	 */
 	backUp(n) {
-		this.pos -= n;
+		this.pos -= (n || 1);
 	}
 
 	/**

@@ -28,4 +28,23 @@ describe('Stream Reader', () => {
 
         assert.equal(s.current(), data.slice(0, 3));
     });
+
+    it('should limit reader range', () => {
+        const outer = new StreamReader('foo bar baz');
+        const inner = outer.limit(4, 7);
+
+        assert(outer !== inner);
+
+        let outerValue = '', innerValue = '';
+        while (!outer.eof()) {
+            outerValue += String.fromCharCode(outer.next());
+        }
+
+        while (!inner.eof()) {
+            innerValue += String.fromCharCode(inner.next());
+        }
+
+        assert.equal(outerValue, 'foo bar baz');
+        assert.equal(innerValue, 'bar');
+    });
 });
