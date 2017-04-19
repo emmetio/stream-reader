@@ -5,9 +5,13 @@
  */
 export default class StreamReader {
 	constructor(string, start, end) {
+		if (end == null && typeof string === 'string') {
+			end = string.length;
+		}
+
 		this.string = string;
 		this.pos = this.start = start || 0;
-		this.end = end != null ? end : this.string.length;
+		this.end = end;
 	}
 
 	/**
