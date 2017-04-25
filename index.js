@@ -100,7 +100,17 @@ export default class StreamReader {
 	 * @returns {String}
 	 */
 	current() {
-		return this.string.slice(this.start, this.pos);
+		return this.substring(this.start, this.pos);
+	}
+
+	/**
+	 * Returns substring for given range
+	 * @param  {Number} start
+	 * @param  {Number} [end]
+	 * @return {String}
+	 */
+	substring(start, end) {
+		return this.string.slice(start, end);
 	}
 
 	/**
