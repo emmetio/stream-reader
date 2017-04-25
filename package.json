@@ -1,6 +1,6 @@
 {
   "name": "@emmetio/stream-reader",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Reads text as stream",
   "main": "dist/stream-reader.cjs.js",
   "module": "dist/stream-reader.es.js",
